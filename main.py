@@ -22,7 +22,8 @@ for x in range(1, len(empty_list)):
     
     else:
         misc_tot+=float(empty_list[x][3])
-
-print(food_tot)
-print(necessity_tot)
-print(misc_tot)
+print ("_____________________________________________________________\n")
+print("Your total spending on food this month is " + str(food_tot))
+print("Your total spending on necessities this month is " + str(necessity_tot))
+print("You have a total of " + str(misc_tot) + " in the misc category")
+print ("_____________________________________________________________")

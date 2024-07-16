@@ -9,7 +9,7 @@ food_tot=0
 necessity_tot=0
 total=0
 
-list_of_necessity=["amazon","esso","hopper","uw","sobeys","petro","ziggy","shopper","home",]
+list_of_necessity=["amazon","esso","hopper","uw","sobeys","petro","ziggy","shopper","home"]
 
 list_food=["domino","popeye","tim","mcdonald"]
 
@@ -27,10 +27,8 @@ for x in empty_list[1:]:
         
     total+= float(x[3])
 
-    
-
 print ("_____________________________________________________________\n")
-print("Your total spending on food this month is " + str(food_tot))
-print("Your total spending on necessities this month is " + str(necessity_tot))
-print("You have a total of " + str(total-food_tot-necessity_tot) + " in the misc category")
+print(f"Your total spending on food this month is {food_tot:.2f}")
+print(f"Your total spending on necessities this month is {necessity_tot:.2f}")
+print(f"You have a total of {total-food_tot-necessity_tot:.2f} in the misc category")
 print ("_____________________________________________________________")

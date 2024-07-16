@@ -1,5 +1,3 @@
-import csv
-
 empty_list=[]
 
 with open('ExpensesPriv.csv') as Expenses:
@@ -22,6 +20,8 @@ for x in range(1, len(empty_list)):
     
     else:
         misc_tot+=float(empty_list[x][3])
+
+
 print ("_____________________________________________________________\n")
 print("Your total spending on food this month is " + str(food_tot))
 print("Your total spending on necessities this month is " + str(necessity_tot))

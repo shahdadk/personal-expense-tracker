@@ -8,22 +8,30 @@ with open('ExpensesPriv.csv') as Expenses:
 misc_tot=0
 food_tot=0
 necessity_tot=0
+total=0
 
-for x in range(1, len(empty_list)):
-    empty_list[x][2] = empty_list[x][2].lower()
+list_of_necessity=["amazon","esso","hopper","uw","sobeys","petro","ziggy","shopper","home",]
 
-    if "mcdonald" in empty_list[x][2] or "domino" in empty_list[x][2] or "popeye" in empty_list[x][2] or "tim" in empty_list[x][2]:
-        food_tot+=float(empty_list[x][3])
+list_food=["domino","popeye","tim","mcdonald"]
 
-    elif "amazon" in empty_list[x][2] or "esso" in empty_list[x][2] or "hopper" in empty_list[x][2] or "uw" in empty_list[x][2] or "sobeys" in empty_list[x][2] or "petro" in empty_list[x][2] or "ziggy" in empty_list[x][2] or "shopper" in empty_list[x][2] or "home" in empty_list[x][2]:
-        necessity_tot+=float(empty_list[x][3])
+for x in empty_list[1:]:
+    x[2] = x[2].lower()
+
+    for y in range(0,len(list_food)):
+        if list_food[y] in x[2]:
+            food_tot+=float(x[3])
     
-    else:
-        misc_tot+=float(empty_list[x][3])
+    for y in range(0,len(list_of_necessity)):
 
+        if list_of_necessity[y] in x[2]:
+            necessity_tot +=float(x[3])
+        
+    total+= float(x[3])
+
+    
 
 print ("_____________________________________________________________\n")
 print("Your total spending on food this month is " + str(food_tot))
 print("Your total spending on necessities this month is " + str(necessity_tot))
-print("You have a total of " + str(misc_tot) + " in the misc category")
+print("You have a total of " + str(total-food_tot-necessity_tot) + " in the misc category")
 print ("_____________________________________________________________")

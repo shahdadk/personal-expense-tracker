@@ -5,7 +5,6 @@ with open('ExpensesPriv.csv') as Expenses:
         empty_list.append(row.split(","))
 
 
-misc_tot=0
 food_tot=0
 necessity_tot=0
 total=0

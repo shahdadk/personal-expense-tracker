@@ -15,8 +15,26 @@ class CSVReader:
         with open(csv_file) as expenses:
             for row in expenses:
                 transaction_list.append(row.split(","))
+        
         return transaction_list
     
+""" Hints:
+
+1. Import categories identifiers through CSV (Dont hardcode anything) DONE
+
+2. Each transaction will belong in a category, each category is a list of transactions DONE
+
+3. For each category return three sets TOtal, Average, and Percentage of TOt DOne
+
+4. Refer to SCreenshot in dsicord for method input and output DONE
+
+5. Create a instance level variable for total transactions (when calculating percetnage) in the init constructor Ddid differently
+
+6. read w3 schools 
+
+
+"""
+
 class TransactionCategorizer:
     """This class categorizes transactions."""
     def __init__(self, TransactionList: list, NecessityList: list, FoodList: list):
@@ -32,65 +50,67 @@ class TransactionCategorizer:
         food_tot=0
         necessity_tot=0
         total=0
+        foodCounter=0
+        necessityCounter=0
+        
 
         for x in self.TransactionList[1:]:
             x[2] = x[2].lower()
 
-            for y in range(0,len(list_food)):
-                if self.FoodList[y] in x[2]:
+            for y in range(0,len(self.FoodList[0])):
+                if self.FoodList[0][y] in x[2]:
                     food_tot+=float(x[3])
+                    foodCounter+=1
             
-            for y in range(0,len(self.NecessityList)):
+            for y in range(0,len(self.NecessityList[0])):
 
-                if self.NecessityList[y] in x[2]:
+                if self.NecessityList[0][y] in x[2]:
                     necessity_tot +=float(x[3])
+                    necessityCounter+=1
                 
             total+= float(x[3])
 
-        return food_tot, necessity_tot, total
+        averageFood=food_tot/foodCounter
+
+        averageNecessity=necessity_tot/necessityCounter
+
+        miscTot=total-food_tot-necessity_tot
+
+        averageMisc=miscTot/(len(transactionList)-foodCounter-necessityCounter)
+
+        foodPercent=food_tot/total*100  
+
+        necessityPercent=necessity_tot/total*100
+
+        miscPercent=miscTot/total*100
+
+
+        return food_tot, averageFood, foodPercent, necessity_tot, averageNecessity, necessityPercent, miscTot, averageMisc, miscPercent, total
 
 class Printer:
     
     def __init__(self, totals):
         self.totals=totals
     
-    def PrintCategories():
-        print("         Total  |  Average  |  Percentage of Total")
-        x=1
-        for x in totals:
-
-            print("Category "+str(x)) 
-            x=+1
-        
-
-
-list_of_necessity=["amazon","esso","hopper","uw","sobeys","petro","ziggy","shopper","home"]
-
-list_food=["domino","popeye","tim","mcdonald"]
-
+    def PrintCategories(self):
+        print("                 Total   |  Average  |   Percentage of Total")
+        print(f"Food Category:   {totals[0]:.2f}      {totals[1]:.2f}        {totals[2]:.0f}") 
+        print(f"Necessity Category: {totals[3]:.2f}    {totals[4]:.2f}    {totals[5]:.0f}")
+        print(f"Misc Category:    {totals[6]:.2f}    {totals[7]:.2f}         {totals[8]:.0f}")
 
 csvReader = CSVReader()
 
+transactionList = csvReader.read('ExpensesPriv.csv')
 
+necessityList = csvReader.read('necessityList.csv')
 
-TransactionList = csvReader.read('ExpensesPriv.csv')
+foodList = csvReader.read('foodList.csv')
 
-TransactionList2 = csvReader.read('ExpensesPriv2.csv')
-
-
-CategorizorInstance = TransactionCategorizer(TransactionList, list_of_necessity, list_food)
+CategorizorInstance = TransactionCategorizer(transactionList, necessityList, foodList)
 
 totals = CategorizorInstance.Categorize()
 
+printerInstance= Printer(totals)
 
+Run=printerInstance.PrintCategories()
 
-
-
-
-
-
-# print ("_____________________________________________________________\n")
-# print(f"Your total spending on food this month is {food_tot:.2f}")
-# print(f"Your total spending on necessities this month is {necessity_tot:.2f}")
-# print(f"You have a total of {total-food_tot-necessity_tot:.2f} in the misc category")
-# print ("_____________________________________________________________")]

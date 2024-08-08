@@ -1,5 +1,3 @@
-
-
 class CSVReader:
     """This class handles reading CSV files."""
     def __init__(self):
@@ -14,103 +12,98 @@ class CSVReader:
         transaction_list=[]
         with open(csv_file) as expenses:
             for row in expenses:
-                transaction_list.append(row.split(","))
+                transaction_list.append(row.strip("\n").split(","))
         
         return transaction_list
-    
-""" Hints:
-
-1. Import categories identifiers through CSV (Dont hardcode anything) DONE
-
-2. Each transaction will belong in a category, each category is a list of transactions DONE
-
-3. For each category return three sets TOtal, Average, and Percentage of TOt DOne
-
-4. Refer to SCreenshot in dsicord for method input and output DONE
-
-5. Create a instance level variable for total transactions (when calculating percetnage) in the init constructor Ddid differently
-
-6. read w3 schools 
-
-
-"""
 
 class TransactionCategorizer:
     """This class categorizes transactions."""
-    def __init__(self, TransactionList: list, NecessityList: list, FoodList: list):
-        self.TransactionList = TransactionList
-        self.NecessityList = NecessityList
-        self.FoodList = FoodList
+    def __init__(self, transactionList: list, categoryList: list):
+        self.transactionList = transactionList
+        self.categoryList = categoryList
 
-    def Categorize(self) -> tuple[float, float, float]:
+    def categorize(self) -> list:
         """Description:
         This method adds your transactions into three categories.
         @returns three floats: food, necessities, and total spending. 
         """
-        food_tot=0
-        necessity_tot=0
-        total=0
-        foodCounter=0
-        necessityCounter=0
+        totalOfTransactions=0
+        totalCount=len(self.transactionList)-1
+
+        categoryStats={"misc": {"count": 0, "average" : 0, "percentage" : 0, "total" : 0}} 
+
+        for category in self.categoryList:
+            categoryStats[category[0]] = {"count": 0, "average" : 0, "percentage" : 0, "total" : 0}
         
+        for transactions in self.transactionList[1:]:
+            transactions[2] = transactions[2].lower()
 
-        for x in self.TransactionList[1:]:
-            x[2] = x[2].lower()
-
-            for y in range(0,len(self.FoodList[0])):
-                if self.FoodList[0][y] in x[2]:
-                    food_tot+=float(x[3])
-                    foodCounter+=1
-            
-            for y in range(0,len(self.NecessityList[0])):
-
-                if self.NecessityList[0][y] in x[2]:
-                    necessity_tot +=float(x[3])
-                    necessityCounter+=1
+            for category in self.categoryList:
+                    
+                for y in range(0,len(category[1])):
+                    if category[1][y] in transactions[2]:
+                        categoryStats[category[0]]["total"]+=float(transactions[3])
+                        categoryStats[category[0]]["count"]+=1
                 
-            total+= float(x[3])
+            totalOfTransactions += float(transactions[3])
 
-        averageFood=food_tot/foodCounter
+        categoryCount = 0
+        categoryTotal = 0
 
-        averageNecessity=necessity_tot/necessityCounter
+        for key in categoryStats:
+            if key != "misc":
+                categoryStats[key]["average"] = categoryStats[key]["total"] / categoryStats[key]["count"]
+                categoryStats[key]["percentage"] = categoryStats[key]["total"] / totalOfTransactions * 100
+                categoryCount += categoryStats[key]["count"]
+                categoryTotal += categoryStats[key]["total"]
+        
+        categoryStats["misc"]["total"] = totalOfTransactions - categoryTotal
+        categoryStats["misc"]["percentage"] = categoryStats["misc"]["total"] / totalOfTransactions
+        categoryStats["misc"]["count"] = totalCount - categoryCount
+        categoryStats["misc"]["average"] = categoryStats["misc"]["total"] / categoryStats["misc"]["count"]
+        
+        return categoryStats
 
-        miscTot=total-food_tot-necessity_tot
+    def printCategories(self, categoryStats):
+        """Description: 
+        This method prints a table of your spending categories. 
+        @param categoryStats: which is all the categories and their respective stats. 
+        """
+        print("Category    | Count | Total     | Average   | Percentage of Total")
+        for category in categoryStats:
+            percent = categoryStats[category]["percentage"]
+            count = categoryStats[category]["count"]
+            total = categoryStats[category]["total"]
+            average= categoryStats[category]["average"]
 
-        averageMisc=miscTot/(len(transactionList)-foodCounter-necessityCounter)
-
-        foodPercent=food_tot/total*100  
-
-        necessityPercent=necessity_tot/total*100
-
-        miscPercent=miscTot/total*100
-
-
-        return food_tot, averageFood, foodPercent, necessity_tot, averageNecessity, necessityPercent, miscTot, averageMisc, miscPercent, total
-
-class Printer:
+            print(f"{category:<11} | {count:>5} | ${total:<8,.2f} | ${average:<8,.2f} | {percent:05.2f}%")
     
-    def __init__(self, totals):
-        self.totals=totals
-    
-    def PrintCategories(self):
-        print("                 Total   |  Average  |   Percentage of Total")
-        print(f"Food Category:   {totals[0]:.2f}      {totals[1]:.2f}        {totals[2]:.0f}") 
-        print(f"Necessity Category: {totals[3]:.2f}    {totals[4]:.2f}    {totals[5]:.0f}")
-        print(f"Misc Category:    {totals[6]:.2f}    {totals[7]:.2f}         {totals[8]:.0f}")
+def getCategories(categoryFiles):
+    """Description:
+    This method gets the categories from the category files. 
+    @param categoryFiles: list of file names in categoryFiles.csv
+    @returns categoryList: a list of categories and their respective entries. 
+    """
+    categoryList=[]
+    csvReader = CSVReader()
+    for x in categoryFiles:
+        categoryList.append([x[0], csvReader.read(x[1])[0]])
+    return categoryList
 
-csvReader = CSVReader()
+def main():
+    csvReader = CSVReader()
 
-transactionList = csvReader.read('ExpensesPriv.csv')
+    transactionList = csvReader.read('ExpensesPriv.csv')
 
-necessityList = csvReader.read('necessityList.csv')
+    categoryFiles=csvReader.read('categoryFiles.csv')
 
-foodList = csvReader.read('foodList.csv')
+    categoryList= getCategories(categoryFiles)
 
-CategorizorInstance = TransactionCategorizer(transactionList, necessityList, foodList)
+    categorizorInstance = TransactionCategorizer(transactionList, categoryList)
 
-totals = CategorizorInstance.Categorize()
+    categoryStats = categorizorInstance.categorize()
 
-printerInstance= Printer(totals)
+    categorizorInstance.printCategories(categoryStats)
 
-Run=printerInstance.PrintCategories()
-
+if __name__ == "__main__":
+    main()
